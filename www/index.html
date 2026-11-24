@@ -1,0 +1,1106 @@
+# M-Pesa Loan Servicing Analyzer
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>M-Pesa Loan Servicing Analyzer</title>
+    <style>
+        :root {
+            --mpesa-green: #00a859;
+            --mpesa-dark: #007a3d;
+            --mpesa-light: #e6f6ee;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border-color: #e5e7eb;
+            --danger-red: #dc2626;
+            --danger-bg: #fef2f2;
+            --warning-amber: #d97706;
+            --warning-bg: #fffbeb;
+            --info-blue: #2563eb;
+            --info-bg: #eff6ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.5;
+            padding-bottom: 3rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--mpesa-green), var(--mpesa-dark));
+            color: white;
+            padding: 1.5rem 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 1rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-title h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+
+        .privacy-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        @media (min-width: 860px) {
+            .main-grid {
+                grid-template-columns: 380px 1fr;
+                align-items: start;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            padding: 1.25rem;
+        }
+
+        .card-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .upload-zone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: #f8fafc;
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--mpesa-green);
+            background: var(--mpesa-light);
+        }
+
+        .upload-zone p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .upload-zone strong {
+            color: var(--mpesa-dark);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-main);
+        }
+
+        textarea {
+            width: 100%;
+            height: 220px;
+            padding: 0.75rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.82rem;
+            resize: vertical;
+            margin-bottom: 1rem;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--mpesa-green);
+            box-shadow: 0 0 0 3px rgba(0, 168, 89, 0.15);
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        button:active {
+            transform: scale(0.99);
+        }
+
+        .btn-primary {
+            background: var(--mpesa-green);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--mpesa-dark);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid #cbd5e1;
+            font-size: 0.85rem;
+            padding: 0.6rem 0.9rem;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .btn-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.6rem;
+        }
+
+        /* Message Box */
+        #messageBox {
+            display: none;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .msg-error {
+            background: var(--danger-bg);
+            color: var(--danger-red);
+            border: 1px solid #fecaca;
+        }
+
+        .msg-success {
+            background: var(--mpesa-light);
+            color: var(--mpesa-dark);
+            border: 1px solid #bbf7d0;
+        }
+
+        /* Dashboard Metrics */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-box {
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1rem;
+        }
+
+        .metric-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .metric-value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin-top: 0.3rem;
+            color: var(--text-main);
+        }
+
+        .metric-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+
+        .status-banner {
+            padding: 1rem 1.25rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.85rem;
+        }
+
+        .status-high {
+            background: var(--danger-bg);
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .status-medium {
+            background: var(--warning-bg);
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .status-clear {
+            background: var(--mpesa-light);
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+
+        /* Lender Breakdown Cards */
+        .lender-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 0.85rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .lender-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 0.9rem;
+            background: #ffffff;
+            border-left: 4px solid var(--mpesa-green);
+        }
+
+        .lender-card.repayment {
+            border-left-color: var(--danger-red);
+        }
+
+        .lender-card.disbursement {
+            border-left-color: var(--info-blue);
+        }
+
+        .lender-name {
+            font-weight: 700;
+            font-size: 0.95rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .badge {
+            font-size: 0.7rem;
+            padding: 0.15rem 0.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .badge-repay {
+            background: var(--danger-bg);
+            color: var(--danger-red);
+        }
+
+        .badge-disburse {
+            background: var(--info-bg);
+            color: var(--info-blue);
+        }
+
+        .badge-auto {
+            background: var(--warning-bg);
+            color: var(--warning-amber);
+        }
+
+        .lender-stats {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .lender-stats div {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.2rem;
+        }
+
+        /* Table */
+        .table-wrapper {
+            overflow-x: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 0.75rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: #f9fafb;
+        }
+
+        .amount-out {
+            color: var(--danger-red);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .amount-in {
+            color: var(--mpesa-dark);
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 0.35rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid #cbd5e1;
+            cursor: pointer;
+        }
+
+        .filter-chip.active {
+            background: var(--mpesa-green);
+            color: white;
+            border-color: var(--mpesa-green);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="container header-content">
+        <div class="header-title">
+            <h1>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                M-Pesa Loan Servicing Detector
+            </h1>
+            <p>Screen M-Pesa statements &amp; SMS logs for active loans, Fuliza deductions, and Sacco repayments</p>
+        </div>
+        <div class="privacy-badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            100% Local Browser Processing
+        </div>
+    </div>
+</header>
+
+<div class="container main-grid">
+    <!-- Left Column: Input Controls -->
+    <div class="card">
+        <div class="card-header">
+            <span>Statement Input</span>
+        </div>
+
+        <div id="messageBox"></div>
+
+        <div class="upload-zone" id="dropZone">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00a859" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+            <p><strong>Click to upload CSV/TXT</strong> or drag &amp; drop exported M-Pesa statement</p>
+            <input type="file" id="fileInput" accept=".csv,.txt,.tsv">
+        </div>
+
+        <label for="statementText">Or Paste Statement Rows / M-Pesa SMS Messages:</label>
+        <textarea id="statementText" placeholder="Paste extracted M-Pesa PDF table rows, CSV data, or M-Pesa SMS messages here...&#10;&#10;Example:&#10;SJK89L21M4 2026-11-18 14:22:10 Pay Bill to 400200 - M-Shwari Loan Repayment Completed -1,500.00 450.00"></textarea>
+
+        <div class="btn-group">
+            <button class="btn-primary" id="analyzeBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                Analyze Statement for Loans
+            </button>
+            <div class="btn-row">
+                <button class="btn-secondary" id="loadSampleBtn">Load Sample Data</button>
+                <button class="btn-secondary" id="clearBtn">Clear All</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Analysis Dashboard -->
+    <div class="card" id="resultsCard">
+        <div class="card-header">
+            <span>Loan &amp; Credit Screening Report</span>
+            <button class="btn-secondary" id="exportCsvBtn" style="display: none; padding: 0.35rem 0.7rem; font-size: 0.8rem;">
+                Export Flagged CSV
+            </button>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="1.5" style="margin-bottom: 0.75rem;">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="16" y1="13" x2="8" y2="13"></line>
+                <line x1="16" y1="17" x2="8" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+            <h3>No Statement Analyzed Yet</h3>
+            <p style="font-size: 0.9rem; max-width: 400px; margin: 0.4rem auto;">
+                Upload an M-Pesa CSV/text export, paste statement lines, or click <strong>"Load Sample Data"</strong> to test how the detector flags active loan servicing.
+            </p>
+        </div>
+
+        <div id="reportContent" style="display: none;">
+            <!-- Verdict Banner -->
+            <div id="statusBanner" class="status-banner"></div>
+
+            <!-- Key Summary Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-label">Loan Repayments Out</div>
+                    <div class="metric-value" id="totalRepaidVal" style="color: var(--danger-red);">KES 0</div>
+                    <div class="metric-sub" id="repaymentCountSub">0 transactions</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Loans Disbursed In</div>
+                    <div class="metric-value" id="totalBorrowedVal" style="color: var(--info-blue);">KES 0</div>
+                    <div class="metric-sub" id="disbursementCountSub">0 transactions</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Active Lenders Found</div>
+                    <div class="metric-value" id="lenderCountVal">0</div>
+                    <div class="metric-sub">Distinct credit providers</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-label">Fuliza Auto-Recoveries</div>
+                    <div class="metric-value" id="fulizaCountVal">0</div>
+                    <div class="metric-sub" id="fulizaTotalSub">KES 0 recovered</div>
+                </div>
+            </div>
+
+            <!-- Lender Breakdown -->
+            <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--text-main);">Detected Lenders &amp; Credit Facilities</h4>
+            <div id="lenderList" class="lender-list"></div>
+
+            <!-- Flagged Transactions Table -->
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <h4 style="font-size: 0.95rem; color: var(--text-main);">Flagged Loan Transactions</h4>
+                <div class="filter-bar" id="filterBar">
+                    <span class="filter-chip active" data-filter="ALL">All Flagged</span>
+                    <span class="filter-chip" data-filter="REPAYMENT">Repayments Out</span>
+                    <span class="filter-chip" data-filter="DISBURSEMENT">Disbursements In</span>
+                    <span class="filter-chip" data-filter="FULIZA">Fuliza</span>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date / Receipt</th>
+                            <th>Lender / Institution</th>
+                            <th>Type</th>
+                            <th>Amount (KES)</th>
+                            <th>Statement Details</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Known Kenyan Mobile Lenders, Banks, Saccos, Paybills & Keywords
+    const LENDER_RULES = [
+        { name: "Fuliza M-Pesa", category: "Overdraft", patterns: [/fuliza/i, /overdraft/i, /od\s*recovery/i, /fuliza\s*m-pesa/i] },
+        { name: "M-Shwari", category: "Bank Mobile Loan", patterns: [/m-shwari/i, /mshwari/i, /m-shwari\s*loan/i] },
+        { name: "KCB M-Pesa", category: "Bank Mobile Loan", patterns: [/kcb\s*m-pesa/i, /kcb\s*mpesa/i, /522522.*loan/i, /522533/i] },
+        { name: "Hustler Fund", category: "Government Credit", patterns: [/hustler\s*fund/i, /222111/i, /financial\s*inclusion\s*fund/i] },
+        { name: "Tala", category: "Digital Lender", patterns: [/\btala\b/i, /851900/i, /inventure/i] },
+        { name: "Branch", category: "Digital Lender", patterns: [/\bbranch\b/i, /998600/i, /branch\s*international/i] },
+        { name: "Zenka", category: "Digital Lender", patterns: [/zenka/i, /4023500/i] },
+        { name: "Timiza (Absa)", category: "Bank Mobile Loan", patterns: [/timiza/i, /300067/i] },
+        { name: "Eazzy Loan (Equity)", category: "Bank Mobile Loan", patterns: [/eazzy\s*loan/i, /equitel\s*loan/i, /247247.*loan/i] },
+        { name: "MCo-op Cash (Co-op Bank)", category: "Bank Mobile Loan", patterns: [/mco-op\s*cash/i, /mcoop\s*cash/i, /400222.*loan/i] },
+        { name: "HF Whizz", category: "Bank Mobile Loan", patterns: [/hf\s*whizz/i, /whizz\s*loan/i] },
+        { name: "NCBA Loop / Digital", category: "Bank Mobile Loan", patterns: [/ncba\s*loop/i, /loop\s*loan/i, /880100.*loan/i] },
+        { name: "Okash / OPay", category: "Digital Lender", patterns: [/okash/i, /opay/i] },
+        { name: "Berry / Kashway / FlashPesa", category: "Digital Lender", patterns: [/berry\s*loan/i, /kashway/i, /flashpesa/i, /ipaisa/i, /credithela/i, /lendplus/i, /mokash/i] },
+        { name: "4G Capital / Numida", category: "SME Micro-Lender", patterns: [/4g\s*capital/i, /numida/i, /asa\s*international/i, /platinum\s*credit/i, /premier\s*credit/i, /izwe/i, /mogo/i, /watu\s*credit/i] },
+        { name: "Sacco / Microfinance Loan", category: "Sacco / MFI", patterns: [/sacco.*loan/i, /loan.*sacco/i, /stima\s*sacco/i, /mwalimu\s*national/i, /harambee\s*sacco/i, /unaitas/i, /kenya\s*women/i, /kwft/i, /faulu/i, /smep/i, /musoni/i] },
+        { name: "Generic Loan / Credit", category: "Unclassified Credit", patterns: [/loan\s*repayment/i, /loan\s*disbursement/i, /loan\s*recovery/i, /credit\s*repayment/i, /installment/i, /arrears/i, /debt\s*recovery/i] }
+    ];
+
+    let parsedTransactions = [];
+    let currentFilter = 'ALL';
+
+    // DOM Elements
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statementText = document.getElementById('statementText');
+    const analyzeBtn = document.getElementById('analyzeBtn');
+    const loadSampleBtn = document.getElementById('loadSampleBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const exportCsvBtn = document.getElementById('exportCsvBtn');
+    const messageBox = document.getElementById('messageBox');
+    const emptyState = document.getElementById('emptyState');
+    const reportContent = document.getElementById('reportContent');
+
+    function showMessage(text, type = 'error') {
+        messageBox.textContent = text;
+        messageBox.className = type === 'error' ? 'msg-error' : 'msg-success';
+        messageBox.style.display = 'block';
+        setTimeout(() => {
+            messageBox.style.display = 'none';
+        }, 5000);
+    }
+
+    // File Upload & Drag-and-Drop Handlers
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        if (e.dataTransfer.files.length) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length) {
+            handleFile(e.target.files[0]);
+        }
+    });
+
+    function handleFile(file) {
+        if (file.name.toLowerCase().endsWith('.pdf')) {
+            showMessage('PDF files cannot be read directly without a backend server. Please open your M-Pesa PDF, select all text (Ctrl+A), copy (Ctrl+C), and paste it into the text box below.');
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            statementText.value = e.target.result;
+            showMessage(`Loaded "${file.name}". Click "Analyze Statement for Loans" to run detection.`, 'success');
+        };
+        reader.readAsText(file);
+    }
+
+    // Load Realistic Sample M-Pesa Statement Data
+    loadSampleBtn.addEventListener('click', () => {
+        statementText.value = `Receipt No,Completion Time,Details,Transaction Status,Paid In,Withdrawn,Balance
+UK19A82B10,2026-11-23 18:45:12,OverDraft of Credit Party - Fuliza M-Pesa Recovery,Completed,0.00,-620.00,1480.00
+UK18C44D21,2026-11-23 18:45:10,Funds received from 0712***890 JOHN KAMAU,Completed,2100.00,0.00,2100.00
+UK15F90E33,2026-11-20 09:14:05,Pay Bill Online to 851900 - TALA LOAN REPAYMENT Acc 0722111222,Completed,0.00,-3450.00,0.00
+UK12G11H45,2026-11-18 11:30:22,Pay Bill to 400200 - M-Shwari Loan Repayment,Completed,0.00,-1800.00,3450.00
+UK09J32K56,2026-11-15 16:05:40,Merchant Payment to NAIVAS SUPERMARKET KISII,Completed,0.00,-2340.00,5250.00
+UK05L77M68,2026-11-10 08:20:15,B2C Payment from 222111 - HUSTLER FUND DISBURSEMENT,Completed,1500.00,0.00,7590.00
+UK02N54P79,2026-11-05 14:12:00,Pay Bill to 522533 - KCB M-PESA LOAN REPAYMENT,Completed,0.00,-2500.00,6090.00
+UJ28Q91R82,2026-11-02 10:00:33,Pay Bill to 745200 - STIMA SACCO LOAN REPAYMENT Acc 44910,Completed,0.00,-4500.00,8590.00
+UJ25S63T94,2026-10-28 19:22:11,OverDraft of Credit Party - Fuliza M-Pesa Recovery,Completed,0.00,-410.00,13090.00
+UJ20V18W05,2026-10-25 12:15:00,Business Payment from 851900 - TALA DISBURSEMENT,Completed,3000.00,0.00,13500.00`;
+        showMessage('Sample M-Pesa statement loaded. Click "Analyze Statement for Loans".', 'success');
+    });
+
+    clearBtn.addEventListener('click', () => {
+        statementText.value = '';
+        fileInput.value = '';
+        parsedTransactions = [];
+        emptyState.style.display = 'block';
+        reportContent.style.display = 'none';
+        exportCsvBtn.style.display = 'none';
+    });
+
+    // Core Parsing & Classification Engine
+    analyzeBtn.addEventListener('click', () => {
+        const rawText = statementText.value.trim();
+        if (!rawText) {
+            showMessage('Please paste M-Pesa statement lines or upload a CSV/text file first.');
+            return;
+        }
+
+        const results = parseMpesaStatement(rawText);
+        parsedTransactions = results;
+
+        if (results.length === 0) {
+            emptyState.style.display = 'none';
+            reportContent.style.display = 'block';
+            exportCsvBtn.style.display = 'none';
+            renderClearReport();
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        reportContent.style.display = 'block';
+        exportCsvBtn.style.display = 'inline-flex';
+        renderReport(results);
+    });
+
+    function parseMpesaStatement(text) {
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 5);
+        const flagged = [];
+
+        lines.forEach((line, idx) => {
+            // Skip CSV header rows
+            if (/^receipt\s*no/i.test(line) && /details/i.test(line)) return;
+
+            // Identify if line matches any lender rule
+            let matchedLender = null;
+            for (const rule of LENDER_RULES) {
+                if (rule.patterns.some(regex => regex.test(line))) {
+                    matchedLender = rule;
+                    break;
+                }
+            }
+
+            if (!matchedLender) return;
+
+            // Extract Receipt Code (e.g., 10-character alphanumeric M-Pesa code)
+            const receiptMatch = line.match(/\b([A-Z0-9]{10})\b/);
+            const receipt = receiptMatch ? receiptMatch[1] : `ROW-${idx + 1}`;
+
+            // Extract Date/Time
+            const dateMatch = line.match(/(\d{4}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}(?::\d{2})?)?|\d{1,2}\/\d{1,2}\/\d{2,4})/);
+            const dateStr = dateMatch ? dateMatch[1] : 'Date N/A';
+
+            // Extract monetary amounts
+            const { amount, direction } = extractAmountAndDirection(line, matchedLender.name);
+
+            // Clean details string
+            const details = cleanDetails(line, receipt, dateStr);
+
+            flagged.push({
+                receipt,
+                date: dateStr,
+                lender: matchedLender.name,
+                category: matchedLender.category,
+                direction, // 'REPAYMENT', 'DISBURSEMENT', or 'FULIZA'
+                amount,
+                details
+            });
+        });
+
+        return flagged;
+    }
+
+    function extractAmountAndDirection(line, lenderName) {
+        let direction = 'REPAYMENT';
+
+        // Determine direction from keywords or sign
+        const isDisbursement = /\b(received|disbursement|disbursed|b2c\s*payment\s*from|business\s*payment\s*from|credited|loan\s*approved)\b/i.test(line);
+        const isFuliza = /fuliza|overdraft|od\s*recovery/i.test(line) || lenderName === 'Fuliza M-Pesa';
+
+        if (isFuliza) {
+            direction = 'FULIZA';
+        } else if (isDisbursement) {
+            direction = 'DISBURSEMENT';
+        }
+
+        // Check structured CSV columns if comma-separated
+        if (line.includes(',')) {
+            const cols = splitCsvLine(line);
+            // Look for Paid In / Withdrawn columns typically near the end
+            const numericCols = cols
+                .map(c => c.replace(/KES|Ksh|\s/gi, ''))
+                .filter(c => /^-?[\d,]+\.\d{2}$/.test(c))
+                .map(c => parseFloat(c.replace(/,/g, '')));
+
+            if (numericCols.length >= 2) {
+                // Usually [PaidIn, Withdrawn, Balance] or [Amount, Balance]
+                if (numericCols.length >= 3) {
+                    const paidIn = numericCols[numericCols.length - 3];
+                    const withdrawn = numericCols[numericCols.length - 2];
+                    if (withdrawn !== 0) {
+                        return {
+                            amount: Math.abs(withdrawn),
+                            direction: isFuliza ? 'FULIZA' : 'REPAYMENT'
+                        };
+                    }
+                    if (paidIn > 0) {
+                        return {
+                            amount: paidIn,
+                            direction: 'DISBURSEMENT'
+                        };
+                    }
+                } else {
+                    const val = numericCols[0];
+                    if (val < 0) {
+                        return {
+                            amount: Math.abs(val),
+                            direction: isFuliza ? 'FULIZA' : 'REPAYMENT'
+                        };
+                    }
+                }
+            }
+        }
+
+        // Fallback: Extract KES / Ksh amounts or decimal currency figures
+        const currencyMatches = [...line.matchAll(/(?:KES|Ksh\.?|-)?\s*([\d,]+\.\d{2})/gi)];
+        if (currencyMatches.length > 0) {
+            // If multiple numbers exist (e.g., Amount and Balance), pick the first non-zero amount
+            for (const m of currencyMatches) {
+                const rawToken = m[0].trim();
+                const val = parseFloat(m[1].replace(/,/g, ''));
+                if (val > 0) {
+                    if (rawToken.startsWith('-') && !isFuliza) {
+                        direction = 'REPAYMENT';
+                    }
+                    return { amount: val, direction };
+                }
+            }
+        }
+
+        return { amount: 0, direction };
+    }
+
+    function splitCsvLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result;
+    }
+
+    function cleanDetails(line, receipt, dateStr) {
+        if (line.includes(',')) {
+            const cols = splitCsvLine(line);
+            // Return the longest descriptive column
+            const descCol = cols.reduce((a, b) => (b.length > a.length && !/^[\d,.-]+$/.test(b) ? b : a), '');
+            if (descCol.length > 8) return descCol;
+        }
+        return line
+            .replace(receipt, '')
+            .replace(dateStr, '')
+            .replace(/Completed/gi, '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    function formatKES(num) {
+        return 'KES ' + num.toLocaleString('en-KE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function renderClearReport() {
+        const banner = document.getElementById('statusBanner');
+        banner.className = 'status-banner status-clear';
+        banner.innerHTML = `
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0;">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <div>
+                <strong>No Loan Servicing Detected</strong>
+                <p style="font-size: 0.88rem; margin-top: 0.2rem;">
+                    No recognizable mobile loan repayments, Fuliza overdraft recoveries, or Sacco loan deductions were found in the provided text.
+                </p>
+            </div>
+        `;
+        document.getElementById('totalRepaidVal').textContent = 'KES 0.00';
+        document.getElementById('repaymentCountSub').textContent = '0 transactions';
+        document.getElementById('totalBorrowedVal').textContent = 'KES 0.00';
+        document.getElementById('disbursementCountSub').textContent = '0 transactions';
+        document.getElementById('lenderCountVal').textContent = '0';
+        document.getElementById('fulizaCountVal').textContent = '0';
+        document.getElementById('fulizaTotalSub').textContent = 'KES 0.00 recovered';
+        document.getElementById('lenderList').innerHTML = '<p style="color:var(--text-muted); font-size:0.88rem;">None detected.</p>';
+        document.getElementById('transactionsBody').innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No loan transactions found.</td></tr>';
+    }
+
+    function renderReport(data) {
+        let totalRepaid = 0;
+        let repaymentCount = 0;
+        let totalBorrowed = 0;
+        let disbursementCount = 0;
+        let fulizaTotal = 0;
+        let fulizaCount = 0;
+
+        const lenderMap = {};
+
+        data.forEach(item => {
+            if (!lenderMap[item.lender]) {
+                lenderMap[item.lender] = {
+                    name: item.lender,
+                    category: item.category,
+                    repaid: 0,
+                    borrowed: 0,
+                    txCount: 0,
+                    lastDate: item.date
+                };
+            }
+            const entry = lenderMap[item.lender];
+            entry.txCount += 1;
+
+            if (item.direction === 'REPAYMENT') {
+                totalRepaid += item.amount;
+                repaymentCount += 1;
+                entry.repaid += item.amount;
+            } else if (item.direction === 'FULIZA') {
+                fulizaTotal += item.amount;
+                fulizaCount += 1;
+                totalRepaid += item.amount;
+                entry.repaid += item.amount;
+            } else if (item.direction === 'DISBURSEMENT') {
+                totalBorrowed += item.amount;
+                disbursementCount += 1;
+                entry.borrowed += item.amount;
+            }
+        });
+
+        const distinctLenders = Object.values(lenderMap);
+
+        // Update Summary Metrics
+        document.getElementById('totalRepaidVal').textContent = formatKES(totalRepaid);
+        document.getElementById('repaymentCountSub').textContent = `${repaymentCount + fulizaCount} debit transaction(s)`;
+        document.getElementById('totalBorrowedVal').textContent = formatKES(totalBorrowed);
+        document.getElementById('disbursementCountSub').textContent = `${disbursementCount} credit transaction(s)`;
+        document.getElementById('lenderCountVal').textContent = distinctLenders.length;
+        document.getElementById('fulizaCountVal').textContent = fulizaCount;
+        document.getElementById('fulizaTotalSub').textContent = `${formatKES(fulizaTotal)} recovered`;
+
+        // Update Verdict Banner
+        const banner = document.getElementById('statusBanner');
+        const activeServicingCount = repaymentCount + fulizaCount;
+        if (activeServicingCount >= 2 || totalRepaid > 0) {
+            banner.className = 'status-banner status-high';
+            banner.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0;">
+                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+                <div>
+                    <strong>Active Loan Servicing Confirmed (${distinctLenders.length} Facility/Facilities)</strong>
+                    <p style="font-size: 0.88rem; margin-top: 0.2rem;">
+                        Detected <strong>${activeServicingCount}</strong> loan repayment or overdraft recovery transaction(s) totaling <strong>${formatKES(totalRepaid)}</strong> across ${distinctLenders.map(l => l.name).join(', ')}.
+                    </p>
+                </div>
+            `;
+        } else {
+            banner.className = 'status-banner status-medium';
+            banner.innerHTML = `
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="flex-shrink:0;">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+                <div>
+                    <strong>Loan Disbursement Activity Detected</strong>
+                    <p style="font-size: 0.88rem; margin-top: 0.2rem;">
+                        Found ${disbursementCount} loan disbursement(s) totaling <strong>${formatKES(totalBorrowed)}</strong>, though no direct repayments appeared in this date window.
+                    </p>
+                </div>
+            `;
+        }
+
+        // Render Lender Cards
+        const lenderListEl = document.getElementById('lenderList');
+        lenderListEl.innerHTML = distinctLenders.map(l => {
+            const isRepaying = l.repaid > 0;
+            return `
+                <div class="lender-card ${isRepaying ? 'repayment' : 'disbursement'}">
+                    <div class="lender-name">
+                        <span>${escapeHtml(l.name)}</span>
+                        <span class="badge ${isRepaying ? 'badge-repay' : 'badge-disburse'}">
+                            ${isRepaying ? 'Servicing' : 'Disbursed'}
+                        </span>
+                    </div>
+                    <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.15rem;">
+                        ${escapeHtml(l.category)} • ${l.txCount} tx(s)
+                    </div>
+                    <div class="lender-stats">
+                        <div><span>Total Repaid:</span> <strong>${formatKES(l.repaid)}</strong></div>
+                        <div><span>Total Borrowed:</span> <span>${formatKES(l.borrowed)}</span></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        renderTable(data);
+    }
+
+    function renderTable(data) {
+        const filtered = currentFilter === 'ALL'
+            ? data
+            : data.filter(item => item.direction === currentFilter);
+
+        const tbody = document.getElementById('transactionsBody');
+        if (filtered.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No transactions match the selected filter.</td></tr>`;
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(item => {
+            let badgeHtml = '';
+            let amtClass = 'amount-out';
+            let sign = '-';
+
+            if (item.direction === 'REPAYMENT') {
+                badgeHtml = '<span class="badge badge-repay">Repayment</span>';
+            } else if (item.direction === 'FULIZA') {
+                badgeHtml = '<span class="badge badge-auto">Fuliza Auto-Debit</span>';
+            } else {
+                badgeHtml = '<span class="badge badge-disburse">Disbursement</span>';
+                amtClass = 'amount-in';
+                sign = '+';
+            }
+
+            return `
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">${escapeHtml(item.receipt)}</div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(item.date)}</div>
+                    </td>
+                    <td><strong>${escapeHtml(item.lender)}</strong></td>
+                    <td>${badgeHtml}</td>
+                    <td class="${amtClass}">${sign}${formatKES(item.amount)}</td>
+                    <td style="max-width: 300px; word-break: break-word;">${escapeHtml(item.details)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // Filter Chips
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            currentFilter = chip.getAttribute('data-filter');
+            renderTable(parsedTransactions);
+        });
+    });
+
+    // Export Flagged Transactions to CSV
+    exportCsvBtn.addEventListener('click', () => {
+        if (!parsedTransactions.length) return;
+        const headers = ['Receipt', 'Date', 'Lender', 'Category', 'Direction', 'Amount_KES', 'Details'];
+        const rows = parsedTransactions.map(t => [
+            t.receipt,
+            t.date,
+            `"${t.lender.replace(/"/g, '""')}"`,
+            `"${t.category}"`,
+            t.direction,
+            t.amount.toFixed(2),
+            `"${t.details.replace(/"/g, '""')}"`
+        ]);
+        const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'mpesa_loan_screening_report.csv';
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    function escapeHtml(str) {
+        const div = document.createElement('div');
+        div.textContent = str;
+        return div.innerHTML;
+    }
+</script>
+</body>
+</html>
+
+

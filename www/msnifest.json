@@ -1,0 +1,32 @@
+{
+  "id": "com.loan.mpesaauditor",
+  "name": "M-Pesa Loan & Unlisted Lender Auditor",
+  "short_name": "Loan Auditor",
+  "description": "Offline-capable M-Pesa statement analyzer that unlocks locked PDFs, excludes Fuliza, and lists all unlisted credit & loan companies by name for disbursements and repayments.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "portrait-primary",
+  "background_color": "#f4f7f6",
+  "theme_color": "#00a859",
+  "lang": "en-KE",
+  "dir": "ltr",
+  "categories": [
+    "finance",
+    "business",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "./icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "prefer_related_applications": false
+}
